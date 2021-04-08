@@ -1,10 +1,9 @@
 'use strict'
-
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { app, protocol, BrowserWindow, Menu, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { appMenuItems, rightClickMenu } from './menuItems.js'
-import { spawn } from 'child_process'
+import { appMenuItems, rightClickDirectoryMenu } from './menuItems.js'
+import { spawn, exec } from 'child_process'
 import store from "./store/store.js"
 import './store/store.js'
 
@@ -21,7 +20,7 @@ async function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      
+      contextIsolation: false,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -88,6 +87,12 @@ if (isDevelopment) {
   }
 }
 
+let exe;
+if (process.platform.includes("win")) {
+  exe = "fileShare.exe";
+} else {
+  exe = "fileShare";
+}
 
 // events
 
@@ -100,12 +105,12 @@ ipcMain.on('start-listening', (event, args) => {
 
 
   console.log(process.cwd(), event, args)
-  let exe;
-  if (process.platform.includes("win")) {
-    exe = "fileShare.exe";
-  } else {
-    exe = "fileShare";
-  }
+  // let exe;
+  // if (process.platform.includes("win")) {
+  //   exe = "fileShare.exe";
+  // } else {
+  //   exe = "fileShare";
+  // }
   console.log(args, args.port, exe, typeof args)
   // --port argument has been fixed. omit the address from port after next fileShare commit.
   let proc = spawn(`${exe}`, 
@@ -123,19 +128,20 @@ ipcMain.on('start-listening', (event, args) => {
     console.log(f)
     event.reply("listener-closed");
   })
-
-  // proc.once('listener-closed') ... 
-  // listen for the process closing (this is one you'd have to mutate on your own) and make sure close-listener doesnt trigger it
 })
 
 ipcMain.on('send', (event, data) => {
   console.log('doo', data)
+  let proc = exec(`${exe} --to=${data.ip} --port=:${data.port} --folder=${data.folder} --key=${data.password} --details=false send`,
+                   {cwd: process.cwd()+"/FileShareProgram"}, (err, stdout, stderr) => {
+                     if (err !== null) {
+                       console.log(err)
+                     }
+                     console.log(stdout, 'ff',stderr, "jjj")
+                     event.reply('output-listen-sender', stdout);
+                   })
 })
 
 ipcMain.on('directory-right-click', (event, data) => {
-  // right click on top level folders
-  console.log(data)
-  rightClickMenu(data).popup(BrowserWindow.fromWebContents(event.sender))
+  rightClickDirectoryMenu(data).popup(BrowserWindow.fromWebContents(event.sender))
 })
-
-console.log(process.version)

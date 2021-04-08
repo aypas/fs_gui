@@ -4,55 +4,48 @@
     <!-- iconbar: place to select component to display in sidebar  -->
     <div id="iconbar">
       <div>
-        <div id="icon" @click="switchOn('folders')"><b-icon-folder variant="light"></b-icon-folder></div>
+        <div id="icon" @click="switchOn('folders')" v-bind:class="{active: sidebarView == 'folders'}"><b-icon-folder variant="light"></b-icon-folder></div>
 
-        <div id="icon" @click="switchOn('server')">
+        <div id="icon" @click="switchOn('server')" v-bind:class="{active: sidebarView == 'server'}">
           <b-icon-power :variant="listening ? 'success' : 'light'"></b-icon-power>
         </div>
 
-        <div id="icon">
+        <div id="icon" v-bind:class="{active: sidebarView == 'send'}">
           <b-icon-arrow-down-right @click="switchOn('send')" variant="light" rotate="270"></b-icon-arrow-down-right>
         </div>
 
         <!-- <div id="icon" @click="switchOn('')"><b-icon-arrow-up-right variant="light"></b-icon-arrow-up-right></div> -->
 
-        <div id="icon" @click="switchOn('contacts')"><b-icon-people variant="light"></b-icon-people></div>
+        <div id="icon" @click="switchOn('contacts')" v-bind:class="{active: sidebarView == 'contacts'}">
+          <b-icon-people variant="light"></b-icon-people>
+        </div>
 
-        <div id="icon" @click="switchOn('info')"><b-icon-info-circle variant="light"></b-icon-info-circle></div>
+        <div id="icon" @click="switchOn('info')" v-bind:class="{active: sidebarView == 'info'}">
+          <b-icon-info-circle variant="light"></b-icon-info-circle>
+        </div>
       </div>
     </div>
 
     <!-- sidebar: there will be a nested if else thing with some components -->
     <div id="sidebar" v-if="!sidebarHidden" v-bind:class="{hidden: sidebarHidden === true}" v-bind:style="{width: sidebarWidth + 'px'}">
       <div id="close-btn" @click="sidebarHidden = !sidebarHidden" >   
-        
         <img src="./assets/close.png" >
       </div>
 
-
       <div id="cunt">
-        <directory v-if="sidebarView == 'folders'" />
-        <server v-else-if="sidebarView == 'server'" />
-        <send v-else-if="sidebarView == 'send'" />
-        <contacts v-else-if="sidebarView == 'contacts'" />
-        <info v-else-if="sidebarView == 'info'" />
+        <keep-alive><directory v-if="sidebarView == 'folders'" /></keep-alive>
+        <keep-alive><server v-if="sidebarView == 'server'" v-on:receive-pass="receivePass($event)"/></keep-alive>
+        <keep-alive><send v-if="sidebarView == 'send'" /></keep-alive>
+        <keep-alive><contacts v-if="sidebarView == 'contacts'" /></keep-alive>
+        <keep-alive><info v-if="sidebarView == 'info'" v-bind:receive-password="receivePassword" /></keep-alive>
       </div>
-
-
-
     </div>
+
     <div id="resize" v-show="!sidebarHidden"></div>
-
-
-    <!-- content: probs gonna make a text editor here -->
+    
     <div id="content">
-      <div>
-        <p>{{sidebarHidden}}</p>
-        <b-button @click="sidebarHidden = !sidebarHidden">Button</b-button>
-        <p class="h2 text-light"> poop {{count}} {{sidebarView}}</p>
-      </div>
+      <editor />
     </div>
-
 
   </div>
 </template>
@@ -60,6 +53,7 @@
 <script>
 import directory from './components/directory-display.vue'
 import contacts from './components/contacts.vue'
+import editor from './components/editor.vue'
 import server from './components/server.vue'
 import send from './components/send.vue'
 import info from './components/info.vue'
@@ -71,6 +65,8 @@ export default {
       sidebarHidden: false,
       sidebarView: "folders",
       sidebarWidth: 200,
+
+      receivePassword: "nopass"
     }
   },
   computed: {
@@ -84,9 +80,12 @@ export default {
   },
   methods: {
     switchOn(to) {
-      console.log("switch")
       this.sidebarView = to
       this.sidebarHidden = false
+    },
+
+    receivePass(e) {
+      this.receivePassword = e;
     },
 
     dragControllerDev() {
@@ -123,6 +122,7 @@ export default {
     info,
     send,
     server,
+    editor,
     contacts,
     directory,
   }
@@ -149,9 +149,10 @@ export default {
   justify-content: center;
   flex-flow: row nowrap;
   height: 100%;
-  width: 80%;
+  width: 100%;
   flex-grow: 1;
   background-color: #2c3e50;
+  color: white;
 }
 
 #sidebar {
@@ -189,6 +190,10 @@ export default {
 #icon {
   margin-bottom: 20px;
   border-radius: 25px;
+}
+
+.active {
+  background-color: #303832;
 }
 
 #icon:hover {

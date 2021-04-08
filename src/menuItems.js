@@ -70,23 +70,43 @@ const items = [
 
 export const appMenuItems = Menu.buildFromTemplate(items)
 
-const deleteFolder = (path, type) => {
+const deleteFolder = (data) => {
   // path should include file name
-  console.log("oo")
-  fs.rmdir(path, {recursive: true}, (err) => {
-    if (err !== null) {
-      console.log("didnt work", err)
-      return null
+  console.log("oo", data)
+  if (data.topLevel === true) {
+    fs.rmdir(`FileShareProgram/${data.folder}/${data.value.name}`, {recursive: true}, (err) => {
+      if (err !== null) {
+        console.log("didnt work", err)
+        return null
+      }
+      refreshFolder(data.folder)()
+    })
+    return null
+  } else {
+    if (data.value.isDir) {
+      fs.rmdir(data.value.path, {recursive: true}, (err) => {
+        if (err !== null) {
+          console.log(err, "failed on child dir")
+          return null
+        }
+        refreshFolder(data.folder)()
+      })
+    } else {
+      fs.rm(data.value.path, (err) => {
+        if (err !== null) {
+          console.log('didnt work child file', err);
+        }
+        refreshFolder(data.folder)();
+      })
     }
-    refreshFolder(type)()
-  })
+  }
 }
 
-export const rightClickMenu = (data) => {
+export const rightClickDirectoryMenu = (data) => {
   const template = [
     {
       label: 'Delete',
-      click: () => { console.log(data, "pp");deleteFolder("FileShareProgram/"+ data.folder + '/' + data.value.name, data.folder) }
+      click: () => { deleteFolder(data) }
     },
 
     {
@@ -101,5 +121,3 @@ export const rightClickMenu = (data) => {
   ]
   return Menu.buildFromTemplate(template)
 }
-
-console.log(fs.rm)

@@ -3,9 +3,9 @@
 
   <div id="ppb">
     <div id="buttons">
-      <button class="tab" @click="folderName='send'" :class="folderName == 'send' ? 'display' : ''">Send</button>
+      <button class="tab" tabindex="-1" @click="folderName='send'" :class="folderName == 'send' ? 'display' : ''">Send</button>
       <div style="width: 3px"></div>
-      <button class="tab" @click="folderName='receive'" :class="folderName == 'receive' ? 'display' : ''">Receive</button>
+      <button class="tab" tabindex="-1" @click="folderName='receive'" :class="folderName == 'receive' ? 'display' : ''">Receive</button>
     </div>
   </div>
 
@@ -19,7 +19,7 @@
           <b-icon-arrow-left-short v-else rotate="270"></b-icon-arrow-left-short>
           <span >{{value.name}}</span>
         </div>
-        <folder v-bind:folder="value.files" v-bind:hidden="true" v-bind:depth="1" v-show="!value.hidden"></folder>
+        <folder v-bind:folder="value.files" v-bind:hidden="true" v-bind:depth="1" v-bind:folder-name="folderName" v-show="!value.hidden"></folder>
       </div>
     </div>
     <!-- <button @click="refresh">pp</button> -->
@@ -51,7 +51,7 @@ export default {
     },
 
     right(value) {
-      ipcRenderer.send('directory-right-click', {value, folder: this.folderName})
+      ipcRenderer.send('directory-right-click', {value, folder: this.folderName, topLevel: true})
     }
   },
 

@@ -1,6 +1,6 @@
 const fsPromises = require("fs").promises
 
-// recursive mind fuck
+// recursive
 const traverseDirectory = async (path, obj) => {
   await fsPromises.readdir(path, {withFileTypes: true})
     .then(async (files) => {
@@ -28,17 +28,16 @@ const traverseDirectory = async (path, obj) => {
 
 // folder struct = {name: str, isDir: bool, files: []files/folders, path: str}
 // files struct = {name: str, isDir, path: str}
-let initialState = {
+const initialState = {
   // topLevelFolders will contain all.
   // it is an object. key will be name of top level folders.
   // each value will be an object containing 
   // {path: str, isDir: bool, files: [array of objects where dirs and files are distinguised by isDir attribute]}
   topLevelFolders: {},
-  
 }
 
 
-let actions = {
+const actions = {
   // get top level folders
   async topLevelFolders(store, folderName) {
     const tl = {}
@@ -54,7 +53,6 @@ let actions = {
   },
 
   async traverseDirectoryWrapper(store, folderName) {
-    
     store.state.topLevelFolders[folderName]
     for (let key in store.state.topLevelFolders[folderName]) {
       console.log(key)
@@ -64,15 +62,15 @@ let actions = {
     console.log("psodf")
     store.commit("commitTopLevel", {key: folderName, folders: store.state.topLevelFolders[folderName]})
   }
-
 }
 
 
-let mutations = {
-
+const mutations = {
   clearState(state) {
     console.log("hole")
-    Object.keys(initialState).forEach(key => { state[key] = initialState[key] })
+    Object.keys(initialState).forEach((key) => { 
+      state[key] = initialState[key]
+    })
   },
 
   commitTopLevel(state, {key, folders}) {
@@ -83,7 +81,6 @@ let mutations = {
     console.log("tried and true h")
     //console.log("ppb",state.topLevelFolders.send.assignment1.name)
   }
-
 }
 
 export const files = {

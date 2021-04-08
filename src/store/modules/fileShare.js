@@ -6,9 +6,7 @@ const emptyState = {
 
   sender: {
     log: []
-  },
-
-  ip: null
+  }
 }
 
 const actions = {

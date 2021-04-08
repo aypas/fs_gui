@@ -1,3 +1,0 @@
-#read chapter 2(visualization, figure arrangement, perception, illustration grids, typefaces and whatnot), 
-#6(on categorical data (bar and column charts pg95 to 130ish)), and chapter 3
-

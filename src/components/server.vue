@@ -1,14 +1,10 @@
 <template>
   <div>
-    <!-- <div id="buttons">
-      <button class="tab" @click="display='listen'" :class="display == 'listen' ? 'display' : ''">Listen</button>
-      <div style="width: 3px"></div>
-      <button class="tab" @click="display='send'" :class="display == 'send' ? 'display' : ''">Send</button>
-    </div> -->
-
     <div v-if="display == 'listen'" class="form">
       <div style="display: flex; justify-content: center">
-         <b-alert show v-if="errors.length !== 0" variant="dark"> {{errors}} </b-alert>
+         <b-alert show v-if="errors.length !== 0" variant="dark"> 
+           {{errors}} 
+          </b-alert>
       </div>
 
 
@@ -74,11 +70,11 @@ export default {
   methods: {
     listen() {
       //ipcRenderer.send('start-listening')
-      console.log("ppp")
       if (this.listenDetails.password !== this.listenDetails.p2) {
         this.errors = "Passwords Do Not Match"
         return
       }
+      this.$emit("receive-pass", this.listenDetails.password)
       let port = parseInt(this.listenDetails.port)
       if (Number.isNaN(port) || port > 9999) {
         this.errors = "Port Must Be a Number Less Than 10000"
